@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "K1-cE5tfZMgI7x80ALeSU"
+uri = "file://ionos-upload.zip"
+type = "unspecified"
+title = "Ionos Upload – as-prodigital.de"
