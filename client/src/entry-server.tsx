@@ -1,3 +1,7 @@
+// SSR setup must be the first import so browser-API stubs are in place
+// before any React component module initialises.
+import "./ssr-setup";
+
 import { renderToString } from "react-dom/server";
 import { useSyncExternalStore } from "react";
 import { HelmetProvider } from "react-helmet-async";
@@ -26,8 +30,8 @@ import NotFound from "@/pages/not-found";
 import { blogPosts } from "@/data/blog-posts";
 import { cities } from "@/data/cities";
 
-const CITY_SLUGS = Object.keys(cities);
-
+/** A static, never-navigating location hook for wouter SSR.
+ *  Provides getServerSnapshot so React 18's useSyncExternalStore is satisfied. */
 function staticLocationHook(path: string) {
   const getPath = () => path;
   const noopSubscribe = () => () => {};
@@ -38,117 +42,7 @@ function staticLocationHook(path: string) {
     ] as [string, (to: string) => void];
 }
 
-function setupPolyfills() {
-  if (typeof (globalThis as any).window !== "undefined") return;
-
-  (globalThis as any).window = {
-    location: {
-      pathname: "/",
-      href: "https://www.as-prodigital.de/",
-      search: "",
-      hash: "",
-    },
-    scrollTo: () => {},
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    matchMedia: () => ({
-      matches: false,
-      addEventListener: () => {},
-      removeEventListener: () => {},
-      addListener: () => {},
-      removeListener: () => {},
-    }),
-    innerWidth: 1200,
-    innerHeight: 800,
-    history: { pushState: () => {}, replaceState: () => {}, state: null, length: 1 },
-    requestAnimationFrame: (cb: () => void) => setTimeout(cb, 0),
-    cancelAnimationFrame: (id: ReturnType<typeof setTimeout>) => clearTimeout(id),
-    performance: { now: () => Date.now() },
-    self: globalThis,
-  };
-
-  (globalThis as any).document = {
-    documentElement: {
-      classList: {
-        add: () => {},
-        remove: () => {},
-        toggle: () => {},
-        contains: () => false,
-      },
-      style: {},
-      lang: "de",
-    },
-    body: {
-      style: {},
-      classList: { add: () => {}, remove: () => {}, contains: () => false },
-    },
-    createElement: () => ({
-      style: {},
-      setAttribute: () => {},
-      removeAttribute: () => {},
-      className: "",
-      innerHTML: "",
-      appendChild: () => {},
-      removeChild: () => {},
-      children: [],
-    }),
-    getElementById: () => null,
-    querySelector: () => null,
-    querySelectorAll: () => [],
-    head: {
-      appendChild: () => {},
-      removeChild: () => {},
-      querySelector: () => null,
-      querySelectorAll: () => [],
-    },
-    createTextNode: (t: string) => ({ nodeValue: t }),
-    createComment: (t: string) => ({ nodeValue: t }),
-    createDocumentFragment: () => ({ appendChild: () => {} }),
-    addEventListener: () => {},
-    removeEventListener: () => {},
-  };
-
-  (globalThis as any).navigator = { userAgent: "node", language: "de", languages: ["de"] };
-
-  const noopStorage = {
-    getItem: () => null,
-    setItem: () => {},
-    removeItem: () => {},
-    clear: () => {},
-    length: 0,
-    key: () => null,
-  };
-  (globalThis as any).localStorage = noopStorage;
-  (globalThis as any).sessionStorage = noopStorage;
-
-  (globalThis as any).IntersectionObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-    constructor() {}
-  };
-  (globalThis as any).ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-    constructor() {}
-  };
-  (globalThis as any).MutationObserver = class {
-    observe() {}
-    disconnect() {}
-    constructor(_cb: unknown) {}
-  };
-
-  (globalThis as any).requestAnimationFrame = (cb: () => void) => setTimeout(cb, 0);
-  (globalThis as any).cancelAnimationFrame = (id: ReturnType<typeof setTimeout>) => clearTimeout(id);
-  (globalThis as any).performance = { now: () => Date.now() };
-  (globalThis as any).CustomEvent = class extends Event {};
-  (globalThis as any).getComputedStyle = () => ({
-    getPropertyValue: () => "",
-    setProperty: () => {},
-  });
-}
-
+/** Returns every URL that needs a static HTML file. */
 export function getRoutes(): string[] {
   const staticRoutes = [
     "/",
@@ -166,7 +60,8 @@ export function getRoutes(): string[] {
 
   const blogRoutes = blogPosts.map((p) => `/blog/${p.slug}`);
 
-  const cityRoutes = CITY_SLUGS.flatMap((slug) => [
+  // cities is Record<slug, CityData>; each slug gets a webdesign and seo page
+  const cityRoutes = Object.keys(cities).flatMap((slug) => [
     `/webdesign-${slug}`,
     `/seo-${slug}`,
   ]);
@@ -174,9 +69,8 @@ export function getRoutes(): string[] {
   return [...staticRoutes, ...blogRoutes, ...cityRoutes];
 }
 
+/** Renders a single route to HTML. Throws on failure – callers decide recovery. */
 export function render(url: string): { html: string; helmet: unknown } {
-  setupPolyfills();
-
   const helmetContext: { helmet?: unknown } = {};
 
   const queryClient = new QueryClient({
@@ -187,53 +81,47 @@ export function render(url: string): { html: string; helmet: unknown } {
 
   const hook = staticLocationHook(url);
 
-  let html = "";
-  try {
-    html = renderToString(
-      <HelmetProvider context={helmetContext}>
-        <QueryClientProvider client={queryClient}>
-          <CookieConsentProvider>
-            <TooltipProvider>
-              <Router hook={hook}>
-                <Switch>
-                  <Route path="/" component={Home} />
-                  <Route path="/leistungen" component={Services} />
-                  <Route path="/ueber-mich" component={About} />
-                  <Route path="/kontakt" component={Contact} />
-                  <Route path="/webdesign" component={WebdesignAlzey} />
-                  <Route path="/seo" component={SeoAlzey} />
-                  <Route path="/webdesign-alzey" component={RichCityWebdesignPage} />
-                  <Route path="/webdesign-worms" component={RichCityWebdesignPage} />
-                  <Route path="/webdesign-kaiserslautern" component={RichCityWebdesignPage} />
-                  <Route path="/webdesign-bingen" component={RichCityWebdesignPage} />
-                  <Route path="/webdesign-bad-kreuznach" component={RichCityWebdesignPage} />
-                  <Route path="/webdesign-ingelheim" component={RichCityWebdesignPage} />
-                  <Route path="/webdesign-mannheim" component={RichCityWebdesignPage} />
-                  <Route path="/seo-alzey" component={SeoAlzeyLanding} />
-                  <Route path="/seo-worms" component={RichCitySeoPage} />
-                  <Route path="/seo-kaiserslautern" component={RichCitySeoPage} />
-                  <Route path="/seo-bingen" component={RichCitySeoPage} />
-                  <Route path="/seo-bad-kreuznach" component={RichCitySeoPage} />
-                  <Route path="/seo-ingelheim" component={RichCitySeoPage} />
-                  <Route path="/seo-mannheim" component={RichCitySeoPage} />
-                  <Route path="/blog" component={Blog} />
-                  <Route path="/blog/:slug" component={BlogDetail} />
-                  <Route path="/impressum" component={Impressum} />
-                  <Route path="/datenschutz" component={Datenschutz} />
-                  <Route path="/agb" component={AGB} />
-                  <Route path="/video-analyse" component={VideoAnalyse} />
-                  <Route component={NotFound} />
-                </Switch>
-              </Router>
-            </TooltipProvider>
-          </CookieConsentProvider>
-        </QueryClientProvider>
-      </HelmetProvider>
-    );
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    console.warn(`[SSR] ${url}: ${msg}`);
-  }
+  const html = renderToString(
+    <HelmetProvider context={helmetContext}>
+      <QueryClientProvider client={queryClient}>
+        <CookieConsentProvider>
+          <TooltipProvider>
+            <Router hook={hook}>
+              <Switch>
+                <Route path="/" component={Home} />
+                <Route path="/leistungen" component={Services} />
+                <Route path="/ueber-mich" component={About} />
+                <Route path="/kontakt" component={Contact} />
+                <Route path="/webdesign" component={WebdesignAlzey} />
+                <Route path="/seo" component={SeoAlzey} />
+                <Route path="/webdesign-alzey" component={RichCityWebdesignPage} />
+                <Route path="/webdesign-worms" component={RichCityWebdesignPage} />
+                <Route path="/webdesign-kaiserslautern" component={RichCityWebdesignPage} />
+                <Route path="/webdesign-bingen" component={RichCityWebdesignPage} />
+                <Route path="/webdesign-bad-kreuznach" component={RichCityWebdesignPage} />
+                <Route path="/webdesign-ingelheim" component={RichCityWebdesignPage} />
+                <Route path="/webdesign-mannheim" component={RichCityWebdesignPage} />
+                <Route path="/seo-alzey" component={SeoAlzeyLanding} />
+                <Route path="/seo-worms" component={RichCitySeoPage} />
+                <Route path="/seo-kaiserslautern" component={RichCitySeoPage} />
+                <Route path="/seo-bingen" component={RichCitySeoPage} />
+                <Route path="/seo-bad-kreuznach" component={RichCitySeoPage} />
+                <Route path="/seo-ingelheim" component={RichCitySeoPage} />
+                <Route path="/seo-mannheim" component={RichCitySeoPage} />
+                <Route path="/blog" component={Blog} />
+                <Route path="/blog/:slug" component={BlogDetail} />
+                <Route path="/impressum" component={Impressum} />
+                <Route path="/datenschutz" component={Datenschutz} />
+                <Route path="/agb" component={AGB} />
+                <Route path="/video-analyse" component={VideoAnalyse} />
+                <Route component={NotFound} />
+              </Switch>
+            </Router>
+          </TooltipProvider>
+        </CookieConsentProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
+  );
 
   return { html, helmet: helmetContext.helmet };
 }
