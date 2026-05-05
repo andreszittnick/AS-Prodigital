@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import andreImage from "@assets/Andre-Szittnick_1762107465807.webp";
 import TypingAnimationSeoWords from "./typing-animation-seo-words";
-import { trackClick } from "@/hooks/use-analytics";
+
 
 export default function HeroSectionSeoSimple() {
   const scrollToSection = (sectionId: string) => {
@@ -128,7 +128,7 @@ export default function HeroSectionSeoSimple() {
               transition={{ duration: 0.6, delay: 0.7 }}
             >
               <motion.button
-                onClick={() => { trackClick("hero-seo-anfragen"); window.location.href = '/kontakt'; }}
+                onClick={() => { window.location.href = '/kontakt'; }}
                 className="text-white px-6 py-3 text-base rounded-full font-semibold hover:shadow-xl transition-all duration-500 ease-in-out"
                 style={{
                   background: '#fa5219',

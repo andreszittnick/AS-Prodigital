@@ -6,7 +6,7 @@ import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import { blogPosts } from "@/data/blog-posts";
 import { useEffect } from "react";
-import { trackClick } from "@/hooks/use-analytics";
+
 
 export default function BlogDetail() {
   const [, params] = useRoute("/blog/:slug");
@@ -258,7 +258,7 @@ export default function BlogDetail() {
             <Link href="/kontakt">
               <a
                 className="inline-block border-2 border-white text-white hover:bg-white/10 font-semibold px-8 py-4 rounded-xl transition-colors duration-300"
-                onClick={() => trackClick("blog-kostenlos-anfragen")}
+                onClick={() => {}}
               >
                 Kostenlos anfragen
               </a>

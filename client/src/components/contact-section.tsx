@@ -3,7 +3,6 @@ import { useInView } from "framer-motion";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
 import { Mail, Phone, MapPin, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,8 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { insertContactInquirySchema, type InsertContactInquiry } from "@shared/schema";
-import { apiRequest } from "@/lib/queryClient";
-import { trackClick } from "@/hooks/use-analytics";
+import { sendContactEmail } from "@/lib/emailjs";
 
 const contactInfo = [
   {
@@ -54,24 +52,22 @@ export default function ContactSection() {
     },
   });
 
-  const submitMutation = useMutation({
-    mutationFn: async (data: InsertContactInquiry) => {
-      const response = await apiRequest("POST", "/api/contact", data);
-      return response.json();
-    },
-    onSuccess: () => {
+  const onSubmit = async (data: InsertContactInquiry) => {
+    try {
+      await sendContactEmail({
+        from_name: `${data.firstName} ${data.lastName}`,
+        from_email: data.email,
+        phone: data.phone || "",
+        company: data.companyName || "",
+        service: data.service,
+        message: data.message || "",
+      });
       setIsSubmitted(true);
       setSubmitError(null);
       form.reset();
-    },
-    onError: (error: any) => {
+    } catch (error: any) {
       setSubmitError(error.message || "Bitte versuchen Sie es später erneut.");
-    },
-  });
-
-  const onSubmit = (data: InsertContactInquiry) => {
-    trackClick("kontaktformular-absenden");
-    submitMutation.mutate(data);
+    }
   };
 
   const handleNewInquiry = () => {
@@ -97,7 +93,6 @@ export default function ContactSection() {
         </motion.div>
         
         <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-start">
-          {/* Contact Form */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
@@ -148,11 +143,7 @@ export default function ContactSection() {
                         <FormItem>
                           <FormLabel>Vorname *</FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="Max" 
-                              {...field} 
-                              data-testid="input-first-name"
-                            />
+                            <Input placeholder="Max" {...field} data-testid="input-first-name" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -165,11 +156,7 @@ export default function ContactSection() {
                         <FormItem>
                           <FormLabel>Nachname *</FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="Mustermann" 
-                              {...field} 
-                              data-testid="input-last-name"
-                            />
+                            <Input placeholder="Mustermann" {...field} data-testid="input-last-name" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -184,11 +171,7 @@ export default function ContactSection() {
                       <FormItem>
                         <FormLabel>Unternehmensname (optional)</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder="Ihr Unternehmen" 
-                            {...field} 
-                            data-testid="input-company-name"
-                          />
+                          <Input placeholder="Ihr Unternehmen" {...field} data-testid="input-company-name" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -203,12 +186,7 @@ export default function ContactSection() {
                         <FormItem>
                           <FormLabel>E-Mail *</FormLabel>
                           <FormControl>
-                            <Input 
-                              type="email" 
-                              placeholder="max@beispiel.de" 
-                              {...field} 
-                              data-testid="input-email"
-                            />
+                            <Input type="email" placeholder="max@beispiel.de" {...field} data-testid="input-email" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -221,12 +199,7 @@ export default function ContactSection() {
                         <FormItem>
                           <FormLabel>Telefonnummer (optional)</FormLabel>
                           <FormControl>
-                            <Input 
-                              type="tel"
-                              placeholder="+49 ..." 
-                              {...field} 
-                              data-testid="input-phone"
-                            />
+                            <Input type="tel" placeholder="+49 ..." {...field} data-testid="input-phone" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -264,12 +237,7 @@ export default function ContactSection() {
                       <FormItem>
                         <FormLabel>Kommentar (optional)</FormLabel>
                         <FormControl>
-                          <Textarea 
-                            rows={4}
-                            placeholder="Erzählen Sie mir von Ihrem Projekt..." 
-                            {...field} 
-                            data-testid="textarea-message"
-                          />
+                          <Textarea rows={4} placeholder="Erzählen Sie mir von Ihrem Projekt..." {...field} data-testid="textarea-message" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -279,10 +247,10 @@ export default function ContactSection() {
                   <Button 
                     type="submit" 
                     className="w-full brand-gradient text-white py-6 rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
-                    disabled={submitMutation.isPending}
+                    disabled={form.formState.isSubmitting}
                     data-testid="button-submit-contact"
                   >
-                    {submitMutation.isPending ? "Wird gesendet..." : "Nachricht senden"}
+                    {form.formState.isSubmitting ? "Wird gesendet..." : "Nachricht senden"}
                   </Button>
                 </form>
               </Form>
@@ -291,7 +259,6 @@ export default function ContactSection() {
             </div>
           </motion.div>
           
-          {/* Contact Information */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}

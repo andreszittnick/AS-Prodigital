@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Code, Brain } from "lucide-react";
 import TypingAnimationWebdesign from "./typing-animation-webdesign";
 import andreImage from "@assets/Andre-Szittnick_1762107465807.webp";
-import { trackClick } from "@/hooks/use-analytics";
+
 
 export default function HeroSectionWebdesign() {
   const scrollToSection = (sectionId: string) => {
@@ -132,7 +132,7 @@ export default function HeroSectionWebdesign() {
               transition={{ duration: 0.6, delay: 0.7 }}
             >
               <motion.button
-                onClick={() => { scrollToSection("contact"); trackClick("hero-webdesign-anfragen"); }}
+                onClick={() => { scrollToSection("contact"); }}
                 className="text-white px-6 py-3 text-base rounded-full font-semibold hover:shadow-xl transition-all duration-500 ease-in-out"
                 style={{
                   background: '#fa5219',

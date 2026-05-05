@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown, Monitor, Search, Video } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useScrollPosition } from "@/hooks/use-scroll";
-import { trackClick } from "@/hooks/use-analytics";
+
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -156,7 +156,7 @@ export default function Navigation() {
             
             <Link href="/video-analyse">
               <motion.button
-                onClick={() => trackClick("nav-video-analyse")}
+                onClick={() => {}}
                 className="text-white px-3 py-2 lg:px-5 lg:py-2 text-xs lg:text-sm rounded-full font-medium hover:shadow-lg transition-all duration-300 bg-[#fa5219] flex items-center gap-1.5"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -169,7 +169,7 @@ export default function Navigation() {
             
             <Link href="/kontakt">
               <motion.button
-                onClick={() => trackClick("nav-kontakt-desktop")}
+                onClick={() => {}}
                 className="text-white px-4 py-2 lg:px-6 lg:py-2 text-sm lg:text-base rounded-full font-medium hover:shadow-lg transition-all duration-300 bg-[#19243b]"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -305,7 +305,7 @@ export default function Navigation() {
               
               <Link href="/video-analyse">
                 <motion.button
-                  onClick={() => { setIsOpen(false); trackClick("mobile-nav-video-analyse"); }}
+                  onClick={() => { setIsOpen(false); }}
                   className="w-full text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 mt-2 flex items-center justify-center gap-2"
                   style={{ background: '#fa5219' }}
                   data-testid="mobile-nav-video-analyse"
@@ -318,7 +318,7 @@ export default function Navigation() {
               
               <Link href="/kontakt">
                 <motion.button
-                  onClick={() => { setIsOpen(false); trackClick("nav-kontakt-aufnehmen"); }}
+                  onClick={() => { setIsOpen(false); }}
                   className="w-full text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 mt-2"
                   style={{ background: '#19243b' }}
                   data-testid="mobile-nav-contact"

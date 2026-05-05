@@ -9,7 +9,6 @@ import { CookieConsentProvider } from "@/hooks/use-cookie-consent";
 import FloatingContactButtons from "@/components/floating-contact-buttons";
 import CookieBanner from "@/components/cookie-banner";
 import CookieSettingsModal from "@/components/cookie-settings-modal";
-import { useAnalytics } from "@/hooks/use-analytics";
 import Home from "@/pages/home";
 import Services from "@/pages/services";
 import About from "@/pages/about";
@@ -25,7 +24,6 @@ import Impressum from "@/pages/impressum";
 import Datenschutz from "@/pages/datenschutz";
 import AGB from "@/pages/agb";
 import VideoAnalyse from "@/pages/video-analyse";
-import AnalyticsDashboard from "@/pages/analytics";
 import NotFound from "@/pages/not-found";
 
 function ScrollToTop() {
@@ -38,18 +36,11 @@ function ScrollToTop() {
   return null;
 }
 
-function AnalyticsTracker() {
-  useAnalytics();
-  return null;
-}
-
 function Router() {
-  const [location] = useLocation();
   return (
     <>
       <ScrollToTop />
-      <AnalyticsTracker />
-      {location !== "/analytics" && <FloatingContactButtons />}
+      <FloatingContactButtons />
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/leistungen" component={Services} />
@@ -77,7 +68,6 @@ function Router() {
         <Route path="/datenschutz" component={Datenschutz} />
         <Route path="/agb" component={AGB} />
         <Route path="/video-analyse" component={VideoAnalyse} />
-        <Route path="/analytics" component={AnalyticsDashboard} />
         <Route component={NotFound} />
       </Switch>
       <CookieBanner />

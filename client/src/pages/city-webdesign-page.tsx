@@ -8,7 +8,7 @@ import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { getCityData } from "@/data/cities";
 import NotFound from "@/pages/not-found";
-import { trackClick } from "@/hooks/use-analytics";
+
 
 export default function CityWebdesignPage() {
   const [location] = useLocation();
@@ -114,12 +114,12 @@ export default function CityWebdesignPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link href="/kontakt">
-                  <Button onClick={() => trackClick("city-webdesign-hero-anfragen")} className="bg-[#fa5219] hover:bg-orange-600 text-white px-8 py-6 text-base font-semibold rounded-xl">
+                  <Button className="bg-[#fa5219] hover:bg-orange-600 text-white px-8 py-6 text-base font-semibold rounded-xl">
                     Kostenlos anfragen <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
                 <Link href="/video-analyse">
-                  <Button onClick={() => trackClick("city-webdesign-video-analyse")} variant="outline" className="border-[#19243b] text-[#19243b] dark:border-gray-400 dark:text-gray-300 px-8 py-6 text-base font-semibold rounded-xl">
+                  <Button variant="outline" className="border-[#19243b] text-[#19243b] dark:border-gray-400 dark:text-gray-300 px-8 py-6 text-base font-semibold rounded-xl">
                     Kostenlose Video-Analyse
                   </Button>
                 </Link>
@@ -233,7 +233,7 @@ export default function CityWebdesignPage() {
                   </div>
                 </div>
                 <Link href="/kontakt">
-                  <Button onClick={() => trackClick("city-webdesign-sidebar-kontakt")} className="w-full bg-[#fa5219] hover:bg-orange-600 text-white font-semibold py-5">
+                  <Button className="w-full bg-[#fa5219] hover:bg-orange-600 text-white font-semibold py-5">
                     Zum Kontaktformular <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
@@ -329,12 +329,12 @@ export default function CityWebdesignPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/kontakt">
-                <Button onClick={() => trackClick("city-webdesign-cta-anfragen")} className="bg-[#fa5219] hover:bg-orange-600 text-white px-8 py-5 font-semibold rounded-xl">
+                <Button className="bg-[#fa5219] hover:bg-orange-600 text-white px-8 py-5 font-semibold rounded-xl">
                   Jetzt kostenlos anfragen
                 </Button>
               </Link>
               <Link href={`/seo-${city.slug}`}>
-                <Button onClick={() => trackClick("city-webdesign-cta-seo-link")} variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-5 font-semibold rounded-xl">
+                <Button variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-5 font-semibold rounded-xl">
                   Auch SEO in {city.name} entdecken
                 </Button>
               </Link>

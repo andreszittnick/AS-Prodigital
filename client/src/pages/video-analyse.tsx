@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { trackClick } from "@/hooks/use-analytics";
+import { sendContactEmail } from "@/lib/emailjs";
 
 const videoAnalyseFormSchema = z.object({
   name: z.string().min(1, "Name ist erforderlich"),
@@ -40,36 +40,20 @@ export default function VideoAnalyse() {
   });
 
   const onSubmit = async (data: VideoAnalyseFormData) => {
-    trackClick("video-analyse-formular-absenden");
     try {
-      const nameParts = data.name.trim().split(' ');
-      const firstName = nameParts[0] || data.name;
-      const lastName = nameParts.slice(1).join(' ') || '';
-      
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email: data.email,
-          phone: data.phone,
-          service: 'Video-Analyse',
-          message: `Website: ${data.website}\nTelefon: ${data.phone}${data.message ? `\n\nNachricht: ${data.message}` : ''}`,
-        }),
+      await sendContactEmail({
+        from_name: data.name,
+        from_email: data.email,
+        phone: data.phone,
+        service: 'Video-Analyse',
+        website: data.website,
+        message: `Website: ${data.website}\nTelefon: ${data.phone}${data.message ? `\n\nNachricht: ${data.message}` : ''}`,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit form');
-      }
-      
       setIsSubmitted(true);
       setSubmitError(null);
       form.reset();
-    } catch (error) {
-      setSubmitError("Bitte versuchen Sie es später erneut oder kontaktieren Sie mich direkt.");
+    } catch (error: any) {
+      setSubmitError(error.message || "Bitte versuchen Sie es später erneut oder kontaktieren Sie mich direkt.");
     }
   };
 

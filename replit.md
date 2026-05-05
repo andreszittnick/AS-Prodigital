@@ -1,6 +1,8 @@
 # Overview
 
-This is a modern full-stack web application built for a digital agency called "AS ProDigital". The application serves as a professional portfolio and contact website, featuring services like web design and SEO optimization. It includes a comprehensive blog with category filtering and SEO-optimized articles. It's built with a React frontend using modern UI components and an Express.js backend with PostgreSQL database integration.
+This is a modern full-stack web application built for the freelancer André Szittnick (AS ProDigital). The application serves as a professional portfolio and contact website, featuring services exclusively in web design and SEO optimization. It includes a comprehensive blog with category filtering and SEO-optimized articles. It's built with a React frontend using modern UI components and an Express.js backend with PostgreSQL database integration.
+
+**Current migration status:** Being prepared for Ionos static webhosting. Analytics removed. EmailJS replaces backend contact form. `.htaccess` ready in `client/public/.htaccess`. Backend (Express+PostgreSQL) only needed during development — not required on Ionos.
 
 # User Preferences
 

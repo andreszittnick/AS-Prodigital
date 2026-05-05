@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -19,31 +19,6 @@ export const contactInquiries = pgTable("contact_inquiries", {
   service: text("service").notNull(),
   message: text("message"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-export const analyticsSessions = pgTable("analytics_sessions", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  sessionId: text("session_id").notNull().unique(),
-  visitorId: text("visitor_id").notNull(),
-  isReturning: boolean("is_returning").notNull().default(false),
-  entryPage: text("entry_page").notNull(),
-  device: text("device").notNull(),
-  referrerSource: text("referrer_source").notNull(),
-  startedAt: timestamp("started_at").defaultNow().notNull(),
-  lastActivity: timestamp("last_activity").defaultNow().notNull(),
-  pageCount: integer("page_count").notNull().default(1),
-  duration: integer("duration").notNull().default(0),
-});
-
-export const analyticsEvents = pgTable("analytics_events", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  sessionId: text("session_id").notNull(),
-  eventType: text("event_type").notNull(),
-  page: text("page").notNull(),
-  element: text("element"),
-  scrollDepth: integer("scroll_depth"),
-  timeOnPage: integer("time_on_page"),
-  timestamp: timestamp("timestamp").defaultNow().notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -69,27 +44,11 @@ export const insertContactInquirySchema = createInsertSchema(contactInquiries).p
   message: z.string().optional(),
 });
 
-export const insertAnalyticsSessionSchema = createInsertSchema(analyticsSessions).omit({
-  id: true,
-  startedAt: true,
-  lastActivity: true,
-});
-
-export const insertAnalyticsEventSchema = createInsertSchema(analyticsEvents).omit({
-  id: true,
-  timestamp: true,
-});
-
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertContactInquiry = z.infer<typeof insertContactInquirySchema>;
 export type ContactInquiry = typeof contactInquiries.$inferSelect;
-export type AnalyticsSession = typeof analyticsSessions.$inferSelect;
-export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
-export type InsertAnalyticsSession = z.infer<typeof insertAnalyticsSessionSchema>;
-export type InsertAnalyticsEvent = z.infer<typeof insertAnalyticsEventSchema>;
 
-// Blog Post Schema
 export const blogPostSchema = z.object({
   id: z.string(),
   title: z.string(),

@@ -1,7 +1,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Target, Zap, TrendingUp, Rocket, Sparkles, ArrowRight, CheckCircle } from 'lucide-react';
-import { trackClick } from '@/hooks/use-analytics';
+
 
 const ProcessTimeline = () => {
   const ref = useRef(null);
@@ -181,7 +181,7 @@ const ProcessTimeline = () => {
                             delay: index * 0.3
                           }}
                           onClick={() => {
-                            if (step.id === 1) trackClick("prozess-kontakt-aufnehmen");
+                            
                             const contactSection = document.getElementById("contact");
                             if (contactSection) {
                               contactSection.scrollIntoView({ behavior: "smooth" });

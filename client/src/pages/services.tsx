@@ -4,7 +4,7 @@ import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import { motion } from "framer-motion";
 import { Code, Search, ArrowRight, Sparkles, Target, TrendingUp } from "lucide-react";
-import { trackClick } from "@/hooks/use-analytics";
+
 
 export default function Services() {
   const services = [
@@ -314,7 +314,7 @@ Besonders für lokale Unternehmen in Alzey und Umgebung ist Local SEO entscheide
               </p>
               <Link href="/kontakt">
                 <motion.button
-                  onClick={() => trackClick("leistungen-kontakt-aufnehmen")}
+                  onClick={() => {}}
                   className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center gap-2"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { sendContactEmail } from "@/lib/emailjs";
 
 const contactFormSchema = z.object({
   firstName: z.string().min(1, "Vorname ist erforderlich"),
@@ -43,23 +44,19 @@ export default function Contact() {
 
   const onSubmit = async (data: ContactFormData) => {
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+      await sendContactEmail({
+        from_name: `${data.firstName} ${data.lastName}`,
+        from_email: data.email,
+        phone: data.phone || "",
+        company: data.companyName || "",
+        service: data.service,
+        message: data.message || "",
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit form');
-      }
-      
       setIsSubmitted(true);
       setSubmitError(null);
       form.reset();
-    } catch (error) {
-      setSubmitError("Bitte versuchen Sie es später erneut oder kontaktieren Sie mich direkt.");
+    } catch (error: any) {
+      setSubmitError(error.message || "Bitte versuchen Sie es später erneut oder kontaktieren Sie mich direkt.");
     }
   };
 
@@ -140,7 +137,6 @@ export default function Contact() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navigation />
       
-      {/* Hero Section */}
       <section className="pt-24 md:pt-32 pb-12 md:pb-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <motion.div
@@ -159,12 +155,10 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* Contact Section */}
       <section className="pb-16 md:pb-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-8 md:gap-12">
             
-            {/* Contact Form */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
@@ -351,7 +345,6 @@ export default function Contact() {
               )}
             </motion.div>
 
-            {/* Contact Info */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
