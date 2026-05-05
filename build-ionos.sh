@@ -10,11 +10,15 @@ echo "  AS-ProDigital – Ionos Static Build"
 echo "================================================"
 
 echo ""
-echo "1/2  Client-Bundle bauen (Vite)..."
+echo "1/3  Client-Bundle bauen (Vite)..."
 npm run build
 
 echo ""
-echo "2/2  Meta-Tags in alle Routen pre-rendern..."
+echo "2/3  SSR-Bundle bauen (für Pre-Rendering)..."
+npx vite build --config vite.ssr.config.ts
+
+echo ""
+echo "3/3  Alle Routen per SSR vorrendern..."
 node scripts/prerender.mjs
 
 echo ""
