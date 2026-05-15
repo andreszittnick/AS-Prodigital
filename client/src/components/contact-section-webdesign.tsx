@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { insertContactInquirySchema, type InsertContactInquiry } from "@shared/schema";
-import { sendContactEmail } from "@/lib/emailjs";
+
 
 const contactInfo = [
   {
@@ -54,19 +54,17 @@ export default function ContactSectionWebdesign() {
 
   const onSubmit = async (data: InsertContactInquiry) => {
     try {
-      await sendContactEmail({
-        from_name: `${data.firstName} ${data.lastName}`,
-        from_email: data.email,
-        phone: data.phone || "",
-        company: data.companyName || "",
-        service: data.service,
-        message: data.message || "",
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
       });
+      if (!response.ok) throw new Error('Fehler beim Senden');
       setIsSubmitted(true);
       setSubmitError(null);
       form.reset();
     } catch (error: any) {
-      setSubmitError(error.message || "Bitte versuchen Sie es später erneut.");
+      setSubmitError("Bitte versuchen Sie es später erneut.");
     }
   };
 

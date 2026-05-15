@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { sendContactEmail } from "@/lib/emailjs";
+
 
 const contactFormSchema = z.object({
   firstName: z.string().min(1, "Vorname ist erforderlich"),
@@ -44,19 +44,17 @@ export default function Contact() {
 
   const onSubmit = async (data: ContactFormData) => {
     try {
-      await sendContactEmail({
-        from_name: `${data.firstName} ${data.lastName}`,
-        from_email: data.email,
-        phone: data.phone || "",
-        company: data.companyName || "",
-        service: data.service,
-        message: data.message || "",
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
       });
+      if (!response.ok) throw new Error('Fehler beim Senden');
       setIsSubmitted(true);
       setSubmitError(null);
       form.reset();
     } catch (error: any) {
-      setSubmitError(error.message || "Bitte versuchen Sie es später erneut oder kontaktieren Sie mich direkt.");
+      setSubmitError("Bitte versuchen Sie es später erneut oder kontaktieren Sie mich direkt.");
     }
   };
 
